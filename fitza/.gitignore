@@ -42,3 +42,6 @@ uploads/*
 
 processed/*
 !processed/.gitkeep
+
+application.yml
+application.properties
