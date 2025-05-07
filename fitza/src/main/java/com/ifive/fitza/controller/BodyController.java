@@ -32,4 +32,13 @@ public class BodyController {
 
         return ResponseEntity.ok(new ResponseDTO<>(SuccessCode.SUCCESS_ANALYZE_BODY, result));
     }
+
+    @GetMapping("/info")
+    public ResponseEntity<ResponseDTO> getBodyInfo(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        String username = jwtUtil.getUsername(token);
+
+        String bodyInfo = bodyService.getBodyInfo(username);
+        return ResponseEntity.ok(new ResponseDTO<>(SuccessCode.SUCCESS_RETRIEVE_BODYINFO, bodyInfo));
+    }
 }

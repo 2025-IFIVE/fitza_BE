@@ -48,4 +48,10 @@ public class BodyService {
         userRepository.save(user);
         return bodyShape;
     }
+
+    public String getBodyInfo(String username) {
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("사용자 정보를 찾을 수 없습니다."));
+        return user.getBodyinfo();
+    }
 }

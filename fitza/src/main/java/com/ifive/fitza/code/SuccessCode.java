@@ -18,7 +18,9 @@ public enum SuccessCode {
     SUCCESS_DELETE_USER(HttpStatus.OK, "회원 탈퇴를 성공했습니다."),
     SUCCESS_UPDATE(HttpStatus.OK, "업데이트가 성공적으로 완료되었습니다."),
     SUCCESS_DELETE_CLOTHING(HttpStatus.OK, "옷 삭제가 성공했습니다."),
-    SUCCESS_ANALYZE_BODY(HttpStatus.OK, "체형 분석 및 저장 완료");
+    SUCCESS_ANALYZE_BODY(HttpStatus.OK, "체형 분석 및 저장이 완료되었습니다."),
+    SUCCESS_RETRIEVE_BODYINFO(HttpStatus.OK, "체형 정보 조회를 성공했습니다.");
+
 
     private final HttpStatus status;
     private final String message;
