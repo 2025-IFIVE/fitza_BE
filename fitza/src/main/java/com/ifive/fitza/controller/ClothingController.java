@@ -1,8 +1,10 @@
 package com.ifive.fitza.controller;
 
+import com.ifive.fitza.code.SuccessCode;
 import com.ifive.fitza.dto.ClothingDetailsResponseDTO;
 import com.ifive.fitza.entity.ClothingDetails;
 import com.ifive.fitza.jwt.JWTUtil;
+import com.ifive.fitza.response.ResponseDTO;
 import com.ifive.fitza.service.ClothingService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -23,29 +25,53 @@ public class ClothingController {
 
     // 옷 등록 (이미지 전송)
     @PostMapping("/upload")
-public ResponseEntity<ClothingDetailsResponseDTO> uploadClothing(
-        @RequestHeader("Authorization") String authHeader,
-        @RequestPart("file") MultipartFile file
-) throws IOException {
-    String token = authHeader.replace("Bearer ", "");
-    String username = jwtUtil.getUsername(token);
-    ClothingDetails saved = clothingService.saveClothing(file, username);
-    return ResponseEntity.ok(clothingService.toDTO(saved));
+    public ResponseEntity<ClothingDetailsResponseDTO> uploadClothing(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestPart("file") MultipartFile file
+    ) throws IOException {
+        String token = authHeader.replace("Bearer ", "");
+        String username = jwtUtil.getUsername(token);
+        ClothingDetails saved = clothingService.saveClothing(file, username);
+        return ResponseEntity.ok(clothingService.toDTO(saved));
+    }
+
+    // 로그인한 유저의 옷 전체 조회
+    @GetMapping("/my")
+    public ResponseEntity<List<ClothingDetailsResponseDTO>> getMyClothes(
+            @RequestHeader("Authorization") String authHeader
+    ) {
+        String token = authHeader.replace("Bearer ", "");
+        String username = jwtUtil.getUsername(token);
+        List<ClothingDetails> myClothes = clothingService.getClothingByUser(username);
+        List<ClothingDetailsResponseDTO> dtos = myClothes.stream()
+                .map(clothingService::toDTO)
+                .toList();
+        return ResponseEntity.ok(dtos);
+    }
+
+    // 단건 조회
+    @GetMapping("/{id}")
+    public ResponseEntity<ClothingDetailsResponseDTO> getClothing(@PathVariable Long id) {
+        ClothingDetails cloth = clothingService.getClothingById(id);
+        return ResponseEntity.ok(clothingService.toDTO(cloth));
+    }
+
+    // 삭제
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ResponseDTO> deleteClothing(@PathVariable Long id) {
+        clothingService.deleteClothing(id);
+        return ResponseEntity
+        .status(SuccessCode.SUCCESS_DELETE_CLOTHING.getStatus().value())
+        .body(new ResponseDTO<>(SuccessCode.SUCCESS_DELETE_CLOTHING, null));
+    }
+
+    // 수정
+    @PutMapping("/{id}")
+    public ResponseEntity<ClothingDetailsResponseDTO> updateClothing(
+            @PathVariable Long id,
+            @RequestBody ClothingDetailsResponseDTO requestDTO
+    ) {
+        ClothingDetails updated = clothingService.updateClothing(id, requestDTO);
+        return ResponseEntity.ok(clothingService.toDTO(updated));
+    }
 }
-
-@GetMapping("/my")
-public ResponseEntity<List<ClothingDetailsResponseDTO>> getMyClothes(
-        @RequestHeader("Authorization") String authHeader
-) {
-    String token = authHeader.replace("Bearer ", "");
-    String username = jwtUtil.getUsername(token);
-
-    List<ClothingDetails> myClothes = clothingService.getClothingByUser(username);
-    List<ClothingDetailsResponseDTO> dtos = myClothes.stream()
-            .map(clothingService::toDTO)
-            .toList();
-
-    return ResponseEntity.ok(dtos);
-}
-}
-
