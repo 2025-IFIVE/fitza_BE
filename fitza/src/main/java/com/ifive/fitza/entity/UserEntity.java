@@ -1,28 +1,36 @@
 package com.ifive.fitza.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.List;
 
 @Entity
-@Builder
+@Table(name = "USER")
 @Getter
-@AllArgsConstructor
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long userid;
 
-    private String username; // 아이디
-    private String name;  // 사용자 이름 필드 추가
-    private String password; // 비밀번호
-    private String nickname; // 닉네임
-    private String phone; // 전화번호
+    private String name;
+
+    @Column(unique = true)
+    private String username;
+
+    private String password;
+
+    private String nickname;
+
+    private String phone;
+
+    private String bodyinfo;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ClothingDetails> clothingDetails;
 }

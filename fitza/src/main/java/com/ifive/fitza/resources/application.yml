@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/fitza?useSSL=false&serverTimezone=UTC
     username: root
-    password: 1234
+    password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -16,4 +16,5 @@ spring:
 
   jwt:
     secret: mysupersecretkeythatshouldbelongenough
+
 
