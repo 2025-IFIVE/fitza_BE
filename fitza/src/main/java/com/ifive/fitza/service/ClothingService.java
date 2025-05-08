@@ -44,8 +44,6 @@ public class ClothingService {
         File destination = new File(dir, savedFileName);
         file.transferTo(destination);
 
-        String imagePath = "/uploads/" + savedFileName;
-
         // 2. FastAPI 호출
         byte[] imageBytes = Files.readAllBytes(destination.toPath());
         ByteArrayResource resource = new ByteArrayResource(imageBytes) {
@@ -72,6 +70,8 @@ public class ClothingService {
         String type = (String) result.get("의류종류");
         Map<String, Object> attrMap = (Map<String, Object>) ((Map<String, Object>) result.get("속성")).get(type);
         Map<String, Object> styleMap = (Map<String, Object>) result.get("스타일");
+
+        String imagePath = (String) result.get("imageUrl"); 
 
         // 3. 결과 저장
         ClothingDetails details = ClothingDetails.builder()

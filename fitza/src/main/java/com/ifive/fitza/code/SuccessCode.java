@@ -19,7 +19,10 @@ public enum SuccessCode {
     SUCCESS_UPDATE(HttpStatus.OK, "업데이트가 성공적으로 완료되었습니다."),
     SUCCESS_DELETE_CLOTHING(HttpStatus.OK, "옷 삭제가 성공했습니다."),
     SUCCESS_ANALYZE_BODY(HttpStatus.OK, "체형 분석 및 저장이 완료되었습니다."),
-    SUCCESS_RETRIEVE_BODYINFO(HttpStatus.OK, "체형 정보 조회를 성공했습니다.");
+    SUCCESS_RETRIEVE_BODYINFO(HttpStatus.OK, "체형 정보 조회를 성공했습니다."),
+    SUCCESS_CREATE_COORDINATION(HttpStatus.OK, "코디 저장 성공"),
+    SUCCESS_UPDATE_COORDINATION(HttpStatus.OK, "코디 수정 성공"),
+    SUCCESS_DELETE_COORDINATION(HttpStatus.OK, "코디 삭제 성공");
 
 
     private final HttpStatus status;
