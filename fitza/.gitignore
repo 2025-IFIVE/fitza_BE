@@ -40,6 +40,9 @@ out/
 uploads/*
 !uploads/.gitkeep
 
+profileimages/*
+!profileimages/.gitkeep
+
 processed/*
 !processed/.gitkeep
 
