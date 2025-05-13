@@ -22,7 +22,11 @@ public enum SuccessCode {
     SUCCESS_RETRIEVE_BODYINFO(HttpStatus.OK, "체형 정보 조회를 성공했습니다."),
     SUCCESS_CREATE_COORDINATION(HttpStatus.OK, "코디 저장 성공"),
     SUCCESS_UPDATE_COORDINATION(HttpStatus.OK, "코디 수정 성공"),
-    SUCCESS_DELETE_COORDINATION(HttpStatus.OK, "코디 삭제 성공");
+    SUCCESS_DELETE_COORDINATION(HttpStatus.OK, "코디 삭제 성공"),
+    SUCCESS_ADD_FRIEND(HttpStatus.OK, "친구 요청을 성공했습니다."),
+    SUCCESS_RESPOND_FRIEND(HttpStatus.OK, "친구 요청 응답이 처리되었습니다."),
+    SUCCESS_GET_FRIEND_LIST(HttpStatus.OK, "친구 목록을 성공적으로 조회했습니다."),
+    SUCCESS_DELETE_FRIEND(HttpStatus.OK, "친구 목록을 성공적으로 삭제했습니다.");
 
 
     private final HttpStatus status;
