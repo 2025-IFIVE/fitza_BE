@@ -19,6 +19,10 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 
+// 기존 import 아래에 추가
+import org.springframework.http.HttpMethod;               // ✅ 추가
+import org.springframework.security.config.Customizer;   // ✅ 추가
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -44,6 +48,7 @@ public class SecurityConfig {
 
         //csrf disable
         http
+                .cors(Customizer.withDefaults())    // ✅ 이 줄 추가
                 .csrf(AbstractHttpConfigurer::disable);
 
         //From 로그인 방식 disable
@@ -57,10 +62,12 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests((auth) -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()   // ✅ 이 줄 추가
                         .requestMatchers(
                                 "/login",
                                 "/error",
                                 "/register",
+                                "/api/auth/**",                // ✅ 이 줄 추가 !!
                                 "/reissue",
                                 "/swagger-ui/**",
                                 "/swagger-resources/**",
