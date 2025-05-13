@@ -1,4 +1,4 @@
-package com.example.demo.confing;
+package com.ifive.fitza.config;
 
 
 import org.springframework.context.annotation.Configuration;
