@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,8 +26,18 @@ public class FriendService {
         UserEntity user = getUserByUsername(username);
         UserEntity friend = getUserById(friendId);
 
-        if (friendRepository.findByUserAndFriend(user, friend).isPresent()) {
-            throw new IllegalStateException("이미 신청한 친구입니다.");
+        Optional<FriendEntity> existing = friendRepository.findByUserAndFriend(user, friend);
+
+        if (existing.isPresent()) {
+            String status = existing.get().getStatus();
+            if ("PENDING".equals(status)) {
+                throw new IllegalStateException("이미 친구 요청을 보냈습니다.");
+            } else if ("ACCEPTED".equals(status)) {
+                throw new IllegalStateException("이미 친구입니다.");
+            } else if ("REJECTED".equals(status)) {
+                // 기존 거절 기록 삭제 후 재신청 허용
+                friendRepository.delete(existing.get());
+            }
         }
 
         FriendEntity request = FriendEntity.builder()
@@ -36,6 +47,8 @@ public class FriendService {
                 .build();
         friendRepository.save(request);
     }
+
+
 
     // 친구 수락/거절
     @Transactional
