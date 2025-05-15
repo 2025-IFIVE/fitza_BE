@@ -11,4 +11,5 @@ public class CoordinationItemDTO {
     private Double y;
     private Double size;
     private String imagePath;
+    private String croppedPath;
 }

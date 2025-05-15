@@ -21,5 +21,7 @@ public class ClothingDetailsResponseDTO {
     private String style;
     private String substyle;
     private String imagePath;
+    private String croppedPath;
+
 }
 

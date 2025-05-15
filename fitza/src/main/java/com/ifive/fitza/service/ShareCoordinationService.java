@@ -64,6 +64,7 @@ public class ShareCoordinationService {
                     .y(item.getY())
                     .size(item.getSize())
                     .imagePath(clothing.getImagePath())
+                    .croppedPath(clothing.getCroppedPath())
                     .build();
         }).toList();
 
@@ -171,6 +172,7 @@ public class ShareCoordinationService {
                     .y(item.getY())
                     .size(item.getSize())
                     .imagePath(clothing.getImagePath())
+                    .croppedPath(clothing.getCroppedPath())
                     .build();
         }).toList();
 

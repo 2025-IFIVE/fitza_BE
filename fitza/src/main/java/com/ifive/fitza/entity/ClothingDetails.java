@@ -33,6 +33,9 @@ public class ClothingDetails {
     @Column(name = "image_path")
     private String imagePath;   // 이미지 경로
 
+    @Column(name = "cropped_path")
+    private String croppedPath;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userid", nullable = false)
     private UserEntity user;    // 옷 등록 유저
