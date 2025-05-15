@@ -3,7 +3,7 @@ package com.ifive.fitza;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.ifive.fitza")
 public class FitzaApplication {
 
 	public static void main(String[] args) {
