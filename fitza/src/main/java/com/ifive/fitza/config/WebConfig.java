@@ -9,9 +9,10 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // /uploads/** 요청은 실제 로컬 uploads 디렉토리에서 읽도록 설정
         registry.addResourceHandler("/uploads/**")
                 .addResourceLocations("file:" + System.getProperty("user.dir") + "/uploads/");
+
+        registry.addResourceHandler("/uploads/cropped/**")
+                .addResourceLocations("file:" + System.getProperty("user.dir") + "/uploads/cropped/");
     }
 }
-

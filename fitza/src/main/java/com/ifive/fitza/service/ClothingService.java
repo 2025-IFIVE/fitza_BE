@@ -34,17 +34,18 @@ public class ClothingService {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
-        // 1. 파일 저장
-        String uploadDir = System.getProperty("user.dir") + File.separator + "uploads";
-        File dir = new File(uploadDir);
-        if (!dir.exists()) dir.mkdirs();
+        // 1. 원본 이미지 저장 (uploads/original/)
+        String baseDir = System.getProperty("user.dir") + File.separator + "uploads";
+        String originalDir = baseDir + File.separator + "original";
+        File originalFolder = new File(originalDir);
+        if (!originalFolder.exists()) originalFolder.mkdirs();
 
         String originalFilename = file.getOriginalFilename();
         String savedFileName = System.currentTimeMillis() + "_" + originalFilename;
-        File destination = new File(dir, savedFileName);
+        File destination = new File(originalFolder, savedFileName);
         file.transferTo(destination);
 
-        // 2. FastAPI 호출
+        // 2. FastAPI analyze 호출
         byte[] imageBytes = Files.readAllBytes(destination.toPath());
         ByteArrayResource resource = new ByteArrayResource(imageBytes) {
             @Override
@@ -53,7 +54,6 @@ public class ClothingService {
             }
         };
 
-        System.out.println("✅ WebClient 호출 전");
         Map<String, Object> result = webClient.post()
                 .uri("/analyze")
                 .contentType(MediaType.MULTIPART_FORM_DATA)
@@ -61,8 +61,7 @@ public class ClothingService {
                 .retrieve()
                 .bodyToMono(Map.class)
                 .block();
-        System.out.println("✅ WebClient 응답 수신 완료");
-        
+
         if (result == null || result.get("의류종류") == null) {
             throw new RuntimeException("FastAPI 응답이 유효하지 않습니다.");
         }
@@ -71,9 +70,10 @@ public class ClothingService {
         Map<String, Object> attrMap = (Map<String, Object>) ((Map<String, Object>) result.get("속성")).get(type);
         Map<String, Object> styleMap = (Map<String, Object>) result.get("스타일");
 
-        String imagePath = (String) result.get("imageUrl"); 
+        String imagePath = (String) result.get("imageUrl");       // ✅ 원본
+String croppedPath = (String) result.get("croppedUrl");   // ✅ 크롭된 이미지 경로
 
-        // 3. 결과 저장
+        // 3. ClothingDetails 저장
         ClothingDetails details = ClothingDetails.builder()
                 .type(type)
                 .category(parseAttr(attrMap.get("카테고리")))
@@ -88,7 +88,8 @@ public class ClothingService {
                 .print(parseAttr(attrMap.get("프린트")))
                 .style(styleMap != null ? (String) styleMap.get("스타일") : null)
                 .substyle(styleMap != null ? (String) styleMap.get("서브스타일") : null)
-                .imagePath(imagePath)
+                .imagePath("/uploads/original/" + savedFileName)
+                .croppedPath(croppedPath)
                 .user(user)
                 .build();
 
@@ -135,7 +136,8 @@ public class ClothingService {
         cloth.setPrint(dto.getPrint());
         cloth.setStyle(dto.getStyle());
         cloth.setSubstyle(dto.getSubstyle());
-        cloth.setImagePath(dto.getImagePath()); 
+        cloth.setImagePath(dto.getImagePath());
+        cloth.setCroppedPath(dto.getCroppedPath());
 
         return clothingRepository.save(cloth);
     }
@@ -157,6 +159,7 @@ public class ClothingService {
                 .style(entity.getStyle())
                 .substyle(entity.getSubstyle())
                 .imagePath(entity.getImagePath())
+                .croppedPath(entity.getCroppedPath())
                 .build();
     }
 }

@@ -21,7 +21,7 @@ public class CoordinationService {
     private final CoordinationItemRepository itemRepo;
     private final ClothingRepository clothingRepository;
 
-    // ✅ 캘린더 코디 저장
+
     public CalendarCoordination saveCoordination(String username, CoordinationRequestDTO dto) {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("사용자 없음"));
@@ -51,7 +51,7 @@ public class CoordinationService {
         return calendar;
     }
 
-    // ✅ 캘린더 코디 단건 조회 (imagePath 포함)
+    //캘린더 코디 단건 조회 (imagePath 포함)
     public CoordinationResponseDTO getCoordination(Long calendarId) {
         CalendarCoordination calendar = calendarRepo.findById(calendarId)
                 .orElseThrow(() -> new RuntimeException("코디 없음"));
@@ -64,7 +64,8 @@ public class CoordinationService {
                             .x(item.getX())
                             .y(item.getY())
                             .size(item.getSize())
-                            .imagePath(clothing.getImagePath())  // ✅ 추가됨
+                            .imagePath(clothing.getImagePath())
+                            .croppedPath(clothing.getCroppedPath())
                             .build();
                 })
                 .toList();
