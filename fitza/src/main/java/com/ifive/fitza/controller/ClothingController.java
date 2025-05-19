@@ -9,6 +9,7 @@ import com.ifive.fitza.service.ClothingService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -73,5 +74,19 @@ public class ClothingController {
     ) {
         ClothingDetails updated = clothingService.updateClothing(id, requestDTO);
         return ResponseEntity.ok(clothingService.toDTO(updated));
+    }
+
+    //cropped 이미지 수정
+    @PutMapping("/{id}/cropped-image")
+    public ResponseEntity<String> updateCroppedImage(
+            @PathVariable("id") Long clothingId,
+            @RequestParam("image") MultipartFile imageFile) {
+        try {
+            clothingService.updateCroppedImage(clothingId, imageFile);
+            return ResponseEntity.ok("Cropped 이미지가 성공적으로 수정되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("이미지 수정 중 오류 발생: " + e.getMessage());
+        }
     }
 }

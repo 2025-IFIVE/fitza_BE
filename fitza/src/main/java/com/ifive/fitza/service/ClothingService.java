@@ -30,6 +30,8 @@ public class ClothingService {
             .baseUrl("http://localhost:8000")
             .build();
 
+    private final String CROPPED_DIR = System.getProperty("user.dir") + File.separator + "uploads/cropped";
+
     public ClothingDetails saveClothing(MultipartFile file, String username) throws IOException {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
@@ -162,4 +164,28 @@ String croppedPath = (String) result.get("croppedUrl");   // ✅ 크롭된 이�
                 .croppedPath(entity.getCroppedPath())
                 .build();
     }
+
+    public void updateCroppedImage(Long clothingId, MultipartFile imageFile) throws IOException {
+    ClothingDetails clothing = clothingRepository.findById(clothingId)
+        .orElseThrow(() -> new IllegalArgumentException("옷 정보 없음"));
+
+    // 기존 이미지 삭제
+    if (clothing.getCroppedPath() != null) {
+        File oldFile = new File(System.getProperty("user.dir") + clothing.getCroppedPath().replace("/", File.separator));
+        if (oldFile.exists()) oldFile.delete();
+    }
+
+    // 새 이미지 저장
+    File dir = new File(CROPPED_DIR);
+    if (!dir.exists()) dir.mkdirs();
+
+    String savedFilename = System.currentTimeMillis() + "_" + imageFile.getOriginalFilename();
+    File destination = new File(dir, savedFilename);
+    imageFile.transferTo(destination);
+
+    // DB 경로 갱신
+    String imagePath = "/uploads/cropped/" + savedFilename;
+    clothing.setCroppedPath(imagePath);
+    clothingRepository.save(clothing);
+}
 }
