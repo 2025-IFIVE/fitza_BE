@@ -26,7 +26,9 @@ public enum SuccessCode {
     SUCCESS_ADD_FRIEND(HttpStatus.OK, "친구 요청을 성공했습니다."),
     SUCCESS_RESPOND_FRIEND(HttpStatus.OK, "친구 요청 응답이 처리되었습니다."),
     SUCCESS_GET_FRIEND_LIST(HttpStatus.OK, "친구 목록을 성공적으로 조회했습니다."),
-    SUCCESS_DELETE_FRIEND(HttpStatus.OK, "친구 목록을 성공적으로 삭제했습니다.");
+    SUCCESS_DELETE_FRIEND(HttpStatus.OK, "친구 목록을 성공적으로 삭제했습니다."),
+    SUCCESS_GET_REQUESTS(HttpStatus.OK, "받은 친구 요청을 성공적으로 조회했습니다.");
+
 
 
     private final HttpStatus status;

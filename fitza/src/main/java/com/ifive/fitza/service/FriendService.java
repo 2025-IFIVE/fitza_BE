@@ -1,6 +1,7 @@
 package com.ifive.fitza.service;
 
 import com.ifive.fitza.dto.FriendRequestDTO;
+import com.ifive.fitza.dto.FriendRequestResponseDTO;
 import com.ifive.fitza.dto.FriendResponseDTO;
 import com.ifive.fitza.entity.FriendEntity;
 import com.ifive.fitza.entity.UserEntity;
@@ -22,9 +23,14 @@ public class FriendService {
     private final UserRepository userRepository;
 
     // 친구 신청
-    public void sendFriendRequest(String username, Long friendId) {
+    // 기존 거절 기록 삭제 후 재신청 허용
+    public void sendFriendRequest(String username, String friendPhone) {
         UserEntity user = getUserByUsername(username);
-        UserEntity friend = getUserById(friendId);
+        UserEntity friend = getUserByPhone(friendPhone);
+
+        if (user.getUserid().equals(friend.getUserid())) {
+            throw new IllegalArgumentException("자기 자신에게 친구 요청을 보낼 수 없습니다.");
+        }
 
         Optional<FriendEntity> existing = friendRepository.findByUserAndFriend(user, friend);
 
@@ -35,7 +41,6 @@ public class FriendService {
             } else if ("ACCEPTED".equals(status)) {
                 throw new IllegalStateException("이미 친구입니다.");
             } else if ("REJECTED".equals(status)) {
-                // 기존 거절 기록 삭제 후 재신청 허용
                 friendRepository.delete(existing.get());
             }
         }
@@ -45,7 +50,13 @@ public class FriendService {
                 .friend(friend)
                 .status("PENDING")
                 .build();
+
         friendRepository.save(request);
+    }
+
+    private UserEntity getUserByPhone(String phone) {
+        return userRepository.findByPhone(phone)
+                .orElseThrow(() -> new IllegalArgumentException("해당 전화번호의 사용자를 찾을 수 없습니다."));
     }
 
 
@@ -103,6 +114,24 @@ public class FriendService {
     }
 
     friendRepository.delete(relation);
+    }
+
+    public List<FriendRequestResponseDTO> getReceivedRequests(String username) {
+    UserEntity me = getUserByUsername(username);
+
+    // 나에게 온 친구 요청 중 PENDING 상태만 조회
+    List<FriendEntity> requests = friendRepository.findByFriendAndStatus(me, "PENDING");
+
+    return requests.stream()
+            .map(req -> {
+                UserEntity sender = req.getUser(); // 신청 보낸 유저
+                return new FriendRequestResponseDTO(
+                        req.getId(),
+                        sender.getUsername(),
+                        sender.getNickname()
+                );
+            })
+            .collect(Collectors.toList());
     }
 }
 

@@ -2,6 +2,7 @@ package com.ifive.fitza.controller;
 
 import com.ifive.fitza.code.SuccessCode;
 import com.ifive.fitza.dto.FriendRequestDTO;
+import com.ifive.fitza.dto.FriendRequestResponseDTO;
 import com.ifive.fitza.dto.FriendResponseDTO;
 import com.ifive.fitza.response.ResponseDTO;
 import com.ifive.fitza.service.FriendService;
@@ -21,20 +22,20 @@ public class FriendController {
     private final JWTUtil jwtUtil;
 
     @PostMapping("/request")
-    public ResponseEntity<ResponseDTO> sendRequest(
-            @RequestHeader("Authorization") String authHeader,
-            @RequestBody FriendRequestDTO requestDTO) {
+public ResponseEntity<ResponseDTO> sendRequest(
+        @RequestHeader("Authorization") String authHeader,
+        @RequestBody FriendRequestDTO requestDTO) {
 
-        String username = jwtUtil.getUsername(authHeader.replace("Bearer ", ""));
-        friendService.sendFriendRequest(username, requestDTO.getFriendId());
+    String username = jwtUtil.getUsername(authHeader.replace("Bearer ", ""));
+    friendService.sendFriendRequest(username, requestDTO.getPhone());
 
-        return ResponseEntity
+    return ResponseEntity
             .status(SuccessCode.SUCCESS_ADD_FRIEND.getStatus().value())
             .body(new ResponseDTO<>(SuccessCode.SUCCESS_ADD_FRIEND, null));
-    }
+}
 
 
-    // 2. 친구 수락 or 거절
+    //친구 수락 or 거절
     @PostMapping("/respond/{requestId}")
     public ResponseEntity<ResponseDTO> respondToRequest(
             @RequestHeader("Authorization") String authHeader,
@@ -50,7 +51,7 @@ public class FriendController {
 
     }
 
-    // 3. 친구 목록 조회
+    //친구 목록 조회
     @GetMapping("/list")
     public ResponseEntity<ResponseDTO> getFriends(
             @RequestHeader("Authorization") String authHeader) {
@@ -63,7 +64,7 @@ public class FriendController {
                 .body(new ResponseDTO<>(SuccessCode.SUCCESS_GET_FRIEND_LIST, friends));
     }
 
-    // 4. 친구 삭제
+    //친구 삭제
     @DeleteMapping("/delete/{friendId}")
     public ResponseEntity<ResponseDTO> deleteFriend(
             @RequestHeader("Authorization") String authHeader,
@@ -77,6 +78,18 @@ public class FriendController {
                 .body(new ResponseDTO<>(SuccessCode.SUCCESS_DELETE_FRIEND, null));
     }
 
+    //받은 친구 요청 목록 확인 
+    @GetMapping("/received")
+    public ResponseEntity<ResponseDTO> getReceivedRequests(
+            @RequestHeader("Authorization") String authHeader) {
+
+        String username = jwtUtil.getUsername(authHeader.replace("Bearer ", ""));
+        List<FriendRequestResponseDTO> requests = friendService.getReceivedRequests(username);
+
+        return ResponseEntity
+                .status(SuccessCode.SUCCESS_GET_REQUESTS.getStatus().value())
+                .body(new ResponseDTO<>(SuccessCode.SUCCESS_GET_REQUESTS, requests));
+    }
 
 }
 
