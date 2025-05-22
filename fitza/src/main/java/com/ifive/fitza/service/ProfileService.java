@@ -59,7 +59,7 @@ public class ProfileService {
     return toDTO(saved);
 }
 
-    // 프로필 조회
+    //로그인한 유저 프로필 조회
     public ProfileResponseDTO getProfile(String username) {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
@@ -78,6 +78,17 @@ public class ProfileService {
             .imagePath(entity.getImagePath())
             .nickname(entity.getUser().getNickname())  
             .build();
+    }
+
+    //id로 프로필 조회 
+    public ProfileResponseDTO getProfileByUserId(Long userId) {
+        UserEntity user = userRepository.findById(Math.toIntExact(userId))
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
+
+        ProfileEntity profile = profileRepository.findByUser(user)
+                .orElseThrow(() -> new IllegalStateException("해당 유저의 프로필이 존재하지 않습니다."));
+
+        return toDTO(profile);
     }
 }
 
