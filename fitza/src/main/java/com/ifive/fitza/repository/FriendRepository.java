@@ -3,6 +3,8 @@ package com.ifive.fitza.repository;
 import com.ifive.fitza.entity.FriendEntity;
 import com.ifive.fitza.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -22,4 +24,8 @@ public interface FriendRepository extends JpaRepository<FriendEntity, Long> {
 
     // 친구 목록 (status = ACCEPTED)
     List<FriendEntity> findByUserOrFriendAndStatus(UserEntity user, UserEntity friend, String status);
+    List<FriendEntity> findByStatusAndUserOrFriend(String status, UserEntity user1, UserEntity user2);
+
+    @Query("SELECT f FROM FriendEntity f WHERE f.status = 'ACCEPTED' AND (f.user = :me OR f.friend = :me)")
+    List<FriendEntity> findAcceptedFriends(@Param("me") UserEntity me);
 }

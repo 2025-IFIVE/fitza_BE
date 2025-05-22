@@ -77,17 +77,26 @@ public class FriendService {
 
     // 친구 목록 조회
     public List<FriendResponseDTO> getFriends(String username) {
-        UserEntity user = getUserByUsername(username);
+    UserEntity me = getUserByUsername(username);
 
-        List<FriendEntity> accepted = friendRepository.findByUserOrFriendAndStatus(user, user, "ACCEPTED");
+    List<FriendEntity> accepted = friendRepository.findAcceptedFriends(me);  //ACCEPTED만 조회
 
-        return accepted.stream()
-                .map(f -> {
-                    UserEntity target = f.getUser().equals(user) ? f.getFriend() : f.getUser();
-                    return new FriendResponseDTO(target.getUserid(), target.getUsername(), target.getNickname());
-                })
-                .collect(Collectors.toList());
-    }
+    return accepted.stream()
+            .map(friendEntity -> {
+                UserEntity target = friendEntity.getUser().equals(me)
+                        ? friendEntity.getFriend()
+                        : friendEntity.getUser();
+
+                return new FriendResponseDTO(
+                        target.getUserid(),
+                        target.getUsername(),
+                        target.getNickname()
+                );
+            })
+            .distinct()
+            .collect(Collectors.toList());
+}
+
 
     private UserEntity getUserByUsername(String username) {
         return userRepository.findByUsername(username)

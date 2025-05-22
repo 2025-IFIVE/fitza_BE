@@ -53,6 +53,21 @@ public class ProfileController {
                 .body(new ResponseDTO<>(SuccessCode.SUCCESS_RETRIEVE_USER, profile));
     }
 
+    @GetMapping("/{userId}")
+    public ResponseEntity<ResponseDTO> getProfileByUserId(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable Long userId) {
+
+        String username = jwtUtil.getUsername(authHeader.replace("Bearer ", ""));
+
+        ProfileResponseDTO profile = profileService.getProfileByUserId(userId);
+
+        return ResponseEntity
+                .status(SuccessCode.SUCCESS_RETRIEVE_USER.getStatus().value())
+                .body(new ResponseDTO<>(SuccessCode.SUCCESS_RETRIEVE_USER, profile));
+    }
+
+
     @PutMapping
     public ResponseEntity<ResponseDTO> updateProfile(
             @RequestHeader("Authorization") String authHeader,
