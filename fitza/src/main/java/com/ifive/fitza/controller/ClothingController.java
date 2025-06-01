@@ -102,4 +102,10 @@ public class ClothingController {
                     .body("이미지 수정 중 오류 발생: " + e.getMessage());
         }
     }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<ClothingDetailsResponseDTO>> getUserClothes(@PathVariable Long userId) {
+        List<ClothingDetailsResponseDTO> clothes = clothingService.getClothesByUserId(userId);
+        return ResponseEntity.ok(clothes);
+    }
 }
