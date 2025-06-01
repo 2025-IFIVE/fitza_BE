@@ -60,6 +60,7 @@ public class SecurityConfig {
                 "/v3/api-docs/**",
                 "/profileimages/**"
             ).permitAll()
+            .requestMatchers("/api/clothing/user/**").permitAll()
             .anyRequest().authenticated()
         );
 
