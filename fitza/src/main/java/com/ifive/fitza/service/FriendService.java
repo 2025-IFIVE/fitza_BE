@@ -63,17 +63,35 @@ public class FriendService {
 
     // 친구 수락/거절
     @Transactional
-    public void respondToRequest(String username, Long requestId, boolean accept) {
-        UserEntity responder = getUserByUsername(username);
-        FriendEntity request = friendRepository.findById(requestId)
-                .orElseThrow(() -> new IllegalArgumentException("요청이 존재하지 않습니다."));
+public void respondToRequest(String username, Long requestId, boolean accept) {
+    UserEntity responder = getUserByUsername(username);
+    FriendEntity request = friendRepository.findById(requestId)
+            .orElseThrow(() -> new IllegalArgumentException("요청이 존재하지 않습니다."));
 
-        if (!request.getFriend().getUserid().equals(responder.getUserid())) {
-            throw new IllegalStateException("응답할 권한이 없습니다.");
+    if (!request.getFriend().getUserid().equals(responder.getUserid())) {
+        throw new IllegalStateException("응답할 권한이 없습니다.");
+    }
+
+    if (accept) {
+        request.setStatus("ACCEPTED");
+
+        //양방향 저장: 반대 방향의 친구 관계도 생성
+        UserEntity requester = request.getUser();
+        boolean reverseExists = friendRepository.findByUserAndFriend(responder, requester).isPresent();
+
+        if (!reverseExists) {
+            FriendEntity reverse = FriendEntity.builder()
+                    .user(responder)
+                    .friend(requester)
+                    .status("ACCEPTED")
+                    .build();
+            friendRepository.save(reverse);
         }
 
-        request.setStatus(accept ? "ACCEPTED" : "REJECTED");
+    } else {
+        request.setStatus("REJECTED");
     }
+}
 
     // 친구 목록 조회
     public List<FriendResponseDTO> getFriends(String username) {
@@ -113,17 +131,21 @@ public class FriendService {
     UserEntity user = getUserByUsername(username);
     UserEntity target = getUserById(friendId);
 
-    // 친구 관계를 양방향으로 조회
-    FriendEntity relation = friendRepository.findByUserAndFriend(user, target)
-            .orElseGet(() -> friendRepository.findByUserAndFriend(target, user)
-                    .orElseThrow(() -> new IllegalArgumentException("해당 친구 관계가 존재하지 않습니다.")));
+    // 1. user → target 방향 삭제
+    friendRepository.findByUserAndFriend(user, target).ifPresent(relation -> {
+        if (!"ACCEPTED".equals(relation.getStatus())) {
+            throw new IllegalStateException("수락된 친구만 삭제할 수 있습니다.");
+        }
+        friendRepository.delete(relation);
+    });
 
-    if (!"ACCEPTED".equals(relation.getStatus())) {
-        throw new IllegalStateException("수락된 친구만 삭제할 수 있습니다.");
-    }
-
-    friendRepository.delete(relation);
-    }
+    // 2. target → user 방향 삭제 (있으면)
+    friendRepository.findByUserAndFriend(target, user).ifPresent(reverse -> {
+        if ("ACCEPTED".equals(reverse.getStatus())) {
+            friendRepository.delete(reverse);
+        }
+    });
+}
 
     public List<FriendRequestResponseDTO> getReceivedRequests(String username) {
     UserEntity me = getUserByUsername(username);
