@@ -18,6 +18,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -188,4 +189,29 @@ String croppedPath = (String) result.get("croppedUrl");   // ✅ 크롭된 이�
     clothing.setCroppedPath(imagePath);
     clothingRepository.save(clothing);
 }
+
+    public List<ClothingDetailsResponseDTO> getClothesByUserId(Long userId) {
+    List<ClothingDetails> clothes = clothingRepository.findByUserId(userId);
+    return clothes.stream()
+        .map(clothing -> ClothingDetailsResponseDTO.builder()
+            .clothid(clothing.getClothid())
+            .type(clothing.getType())
+            .category(clothing.getCategory())
+            .length(clothing.getLength())
+            .sleeve(clothing.getSleeve())
+            .neckline(clothing.getNeckline())
+            .neck(clothing.getNeck())
+            .fit(clothing.getFit())
+            .color(clothing.getColor())
+            .material(clothing.getMaterial())
+            .detail(clothing.getDetail())
+            .print(clothing.getPrint())
+            .style(clothing.getStyle())
+            .substyle(clothing.getSubstyle())
+            .imagePath(clothing.getImagePath())
+            .croppedPath(clothing.getCroppedPath())
+            .build()
+        ).collect(Collectors.toList());
+}
+
 }
