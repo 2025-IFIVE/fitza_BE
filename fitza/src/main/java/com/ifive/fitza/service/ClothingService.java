@@ -188,4 +188,9 @@ String croppedPath = (String) result.get("croppedUrl");   // ✅ 크롭된 이�
     clothing.setCroppedPath(imagePath);
     clothingRepository.save(clothing);
 }
+    public List<ClothingDetails> getRecentClothingByUser(String username) {
+    UserEntity user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("해당 사용자가 존재하지 않습니다."));
+    return clothingRepository.findByUserOrderByClothidDesc(user);
+}
 }

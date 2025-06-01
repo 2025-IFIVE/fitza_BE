@@ -14,5 +14,7 @@ public interface ClothingRepository extends JpaRepository<ClothingDetails, Long>
     List<ClothingDetails> findByUser(UserEntity user);
 
     List<ClothingDetails> findByUser_Userid(Long userId);
+
+    List<ClothingDetails> findByUserOrderByClothidDesc(UserEntity user);
 }
 
