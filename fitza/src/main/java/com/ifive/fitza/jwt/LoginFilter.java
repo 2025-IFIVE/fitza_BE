@@ -7,7 +7,6 @@ import com.ifive.fitza.dto.CustomUserDetails;
 import com.ifive.fitza.dto.LoginRequest;
 import com.ifive.fitza.response.ErrorResponseDTO;
 import com.ifive.fitza.response.ResponseDTO;
-
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -41,10 +40,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String username = loginRequest.getUsername();
         String password = loginRequest.getPassword();
 
-        System.out.println(username);
-
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username, password, null);
-
         return authenticationManager.authenticate(authToken);
     }
 
@@ -52,12 +48,12 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException {
 
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-
         String username = customUserDetails.getUsername();
+        Long userId = customUserDetails.getUserId();  
 
         // JWT 생성
-        String accessToken = jwtUtil.createJwt("accessToken", username, 86400000L);
-        String refreshToken = jwtUtil.createJwt("refreshToken", username, 86400000L);
+        String accessToken = jwtUtil.createJwt("accessToken", username, userId, 86400000L);
+        String refreshToken = jwtUtil.createJwt("refreshToken", username, userId, 86400000L);
 
         response.addHeader("accessToken", "Bearer " + accessToken);
         response.addHeader("refreshToken", "Bearer " + refreshToken);

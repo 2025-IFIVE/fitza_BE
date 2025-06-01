@@ -29,4 +29,18 @@ public class InternalUploadController {
 
         return ResponseEntity.ok("/uploads/cropped/" + filename);
     }
+
+    @PostMapping("/upload-original")
+public ResponseEntity<String> receiveOriginalImage(@RequestPart("file") MultipartFile file) throws IOException {
+    String saveDir = System.getProperty("user.dir") + "/uploads/original/";
+    File dir = new File(saveDir);
+    if (!dir.exists()) dir.mkdirs();
+
+    String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
+    File targetFile = new File(saveDir + filename);
+    file.transferTo(targetFile);
+
+    return ResponseEntity.ok("/uploads/original/" + filename);
+}
+
 }

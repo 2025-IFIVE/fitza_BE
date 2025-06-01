@@ -1,18 +1,12 @@
 package com.ifive.fitza.controller;
 
 import com.ifive.fitza.dto.MatchResultDTO;
+import com.ifive.fitza.jwt.JWTUtil;
 import com.ifive.fitza.service.MatchService;
 import lombok.RequiredArgsConstructor;
-import com.ifive.fitza.jwt.JWTUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
 
@@ -29,10 +23,13 @@ public class MatchController {
             @RequestHeader("Authorization") String authHeader,
             @RequestPart("file") MultipartFile file) throws IOException {
 
+        // 🔐 토큰에서 username과 token 추출
         String token = authHeader.replace("Bearer ", "");
         String username = jwtUtil.getUsername(token);
-        MatchResultDTO result = matchService.matchOutfitWithUsername(file, username);
+
+        // ✅ 토큰까지 함께 전달
+        MatchResultDTO result = matchService.matchOutfitWithUsername(file, username, token);
+
         return ResponseEntity.ok(result);
     }
 }
-

@@ -47,14 +47,16 @@ public class JWTUtil {
         return claims.getExpiration().before(new Date());
     }
 
-    public String createJwt(String type, String username, Long expiredMs) {
-        return Jwts.builder()
-                .setSubject("JWT Token")
-                .claim("type", type)
-                .claim("username", username)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expiredMs))
-                .signWith(secretKey, SignatureAlgorithm.HS256)
-                .compact();
+    public String createJwt(String type, String username, Long userId, Long expiredMs) {
+    return Jwts.builder()
+            .setSubject("JWT Token")
+            .claim("type", type)
+            .claim("username", username)
+            .claim("userId", userId) 
+            .setIssuedAt(new Date())
+            .setExpiration(new Date(System.currentTimeMillis() + expiredMs))
+            .signWith(secretKey, SignatureAlgorithm.HS256)
+            .compact();
     }
+
 }
