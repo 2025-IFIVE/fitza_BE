@@ -50,6 +50,19 @@ public class ClothingController {
         return ResponseEntity.ok(dtos);
     }
 
+    @GetMapping("/my/recent")
+    public ResponseEntity<List<ClothingDetailsResponseDTO>> getMyRecentClothes(
+            @RequestHeader("Authorization") String authHeader
+    ) {
+        String token = authHeader.replace("Bearer ", "");
+        String username = jwtUtil.getUsername(token);
+        List<ClothingDetails> recentClothes = clothingService.getRecentClothingByUser(username);
+        List<ClothingDetailsResponseDTO> dtos = recentClothes.stream()
+                .map(clothingService::toDTO)
+                .toList();
+        return ResponseEntity.ok(dtos);
+    }
+
     // 단건 조회
     @GetMapping("/{id}")
     public ResponseEntity<ClothingDetailsResponseDTO> getClothing(@PathVariable Long id) {

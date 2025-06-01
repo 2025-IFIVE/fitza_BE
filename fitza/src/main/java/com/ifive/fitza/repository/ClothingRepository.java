@@ -17,5 +17,9 @@ public interface ClothingRepository extends JpaRepository<ClothingDetails, Long>
 
     @Query("SELECT c FROM ClothingDetails c WHERE c.user.userid = :userId")
     List<ClothingDetails> findByUserId(@Param("userId") Long userId);
+
+    List<ClothingDetails> findByUser_Userid(Long userId);
+
+    List<ClothingDetails> findByUserOrderByClothidDesc(UserEntity user);
 }
 
